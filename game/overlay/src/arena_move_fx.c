@@ -26,6 +26,8 @@ static EWRAM_DATA u8 sActorFx[2] = {};
 static EWRAM_DATA u16 sDrawn[2] = {};
 static EWRAM_DATA u16 sBoltFrames[ARENA_BOLT_SLOTS] = {};
 static const u32 sFlameTiles[]=INCBIN_U32("graphics/arena/flame/plume.4bpp");
+static const u32 sGuardTiles[]=INCBIN_U32("graphics/arena/guard/effect.4bpp");
+static const u16 sGuardPalette[]=INCBIN_U16("graphics/arena/guard/palette.gbapal");
 static const u32 sSignatureForest[]=INCBIN_U32("graphics/arena/signatures150/forest.4bpp");
 static const u32 sSignatureExtra[]=INCBIN_U32("graphics/arena/signatures150-extra/forest.4bpp");
 #define sSignatureTiles sSignatureForest
@@ -79,6 +81,14 @@ void ArenaMoveFx_Init(void)
     // Reuse the two existing action tile banks and spare fire-palette entries.
     // One bounded double-size affine object per side. No extra VRAM or heap.
     gArenaFlameFxFailures=0;
+    {
+        struct SpritePalette pal={sGuardPalette,0xA870};
+        u32 side,slot;
+        bool8 needed=FALSE;
+        for(side=0;side<2;side++)for(slot=0;slot<MAX_MON_MOVES;slot++)
+            if(gBattleMons[side].moves[slot]==MOVE_PROTECT||gBattleMons[side].moves[slot]==MOVE_HYPER_BEAM)needed=TRUE;
+        if(needed)LoadSpritePalette(&pal);
+    }
     LoadPalette(sFlamePalette,OBJ_PLTT_ID(ArenaFeedback_FirePalette())+5,14);
     for(i=0;i<3;i++)LoadPalette(sSignaturePalettes[i],OBJ_PLTT_ID(IndexOfSpritePaletteTag(0xA741+i))+5,14);
     LoadPalette(sElectricRamp,OBJ_PLTT_ID(IndexOfSpritePaletteTag(0xA741))+12,8);
@@ -87,7 +97,7 @@ void ArenaMoveFx_Init(void)
     {
         u32 j;
         bool8 needed=FALSE;
-        for(j=0;j<MAX_MON_MOVES;j++)if(ArenaMoves_Beam(gBattleMons[i].moves[j]))needed=TRUE;
+        for(j=0;j<MAX_MON_MOVES;j++)if(ArenaMoves_Beam(gBattleMons[i].moves[j])||gBattleMons[i].moves[j]==MOVE_PROTECT)needed=TRUE;
         sFlameSprites[i]=MAX_SPRITES;
         if(needed)
         {
@@ -114,23 +124,40 @@ void ArenaMoveFx_Flame(u8 side,u16 move,s16 x,s16 y,u8 dir,u8 age,u8 reach,bool8
     stamp=0xC000|(kind<<8)|frame;
     if(active&&reach&&sDrawn[side]!=stamp)
     {
-        ArenaRender_Copy(kind==1?sFlameTiles+frame*512:group>=6?sSignatureExtra+((group-6)*8+frame)*512:sSignatureTiles+(group*8+frame)*512,
+        ArenaRender_Copy(kind==9?sGuardTiles+(32+frame)*512:kind==1?sFlameTiles+frame*512:group>=6?sSignatureExtra+((group-6)*8+frame)*512:sSignatureTiles+(group*8+frame)*512,
             (u8*)OBJ_VRAM0+GetSpriteTileStartByTag(TAG+side)*32,2048);
         sDrawn[side]=stamp;
     }
     if(sFlameSprites[side]<MAX_SPRITES)
     {
         struct Sprite *s=&gSprites[sFlameSprites[side]];
-        s32 inverseX=56*256/max(8,reach),inverseY=180*120/max(30,reach);
+        s32 inverseX=56*256/max(8,reach),inverseY=kind==9?112:180*120/max(30,reach);
         s16 dx=sDirections[dir][0],dy=sDirections[dir][1],d=reach/2+5;
         s->invisible=!active||!reach;
         if(s->invisible)return;
-        s->oam.paletteNum=kind==1?ArenaFeedback_FirePalette():SignaturePalette(group);
+        s->oam.paletteNum=kind==9?IndexOfSpritePaletteTag(0xA870):kind==1?ArenaFeedback_FirePalette():SignaturePalette(group);
         s->x=x+dx*d/256;s->y=y+dy*d/256;
         SetOamMatrix(s->oam.matrixNum,dx*inverseX/256,dy*inverseX/256,-dy*inverseY/256,dx*inverseY/256);
     }
 }
 u8 ArenaMoveFx_Palette(u8 material){return IndexOfSpritePaletteTag(TAG+material);}
+void ArenaMoveFx_Guard(u8 side,s16 x,s16 y,u8 frame,u8 dir)
+{
+    struct Sprite *s;
+    s16 dx=sDirections[dir&7][0],dy=sDirections[dir&7][1];
+    if(sFlameSprites[side]==MAX_SPRITES||frame>=32)return;
+    if(sActorFx[side]!=MAX_SPRITES)gSprites[sActorFx[side]].invisible=TRUE;
+    // Reuse the existing affine object: the incoming energy always faces the
+    // attacker, including diagonal impacts. No duplicate VRAM tile bank.
+    s=&gSprites[sFlameSprites[side]];s->invisible=FALSE;s->x=x;s->y=y;
+    SetOamMatrix(s->oam.matrixNum,-dy,dx,-dx,-dy);
+    s->oam.paletteNum=IndexOfSpritePaletteTag(0xA870);
+    if(sDrawn[side]!=(0xE000|frame))
+    {
+        ArenaRender_Copy(sGuardTiles+frame*512,(u8*)OBJ_VRAM0+GetSpriteTileStartByTag(TAG+side)*32,2048);
+        sDrawn[side]=0xE000|frame;
+    }
+}
 void ArenaMoveFx_Psychic(u8 side,s16 x,s16 y,u8 frame,bool8 visible)
 {
     struct Sprite *s;

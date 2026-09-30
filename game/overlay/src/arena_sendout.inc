@@ -69,7 +69,7 @@ static void SendoutInit(void)
         struct SpriteSheet sheet={sSendoutFrames,2048,SENDOUT_TAG+i};
         sSendout.frame[i]=255;
         // Wild opponents are already in their habitat; never throw their ball.
-        if(i&&!gArenaSendoutTelemetry[5])continue;
+        if(!(sArenaSendoutMask&(1<<i)) || (i&&!gArenaSendoutTelemetry[5]))continue;
         fx.tileTag=SENDOUT_TAG+i;fx.paletteTag=SHOT_TAG;fx.oam=&sSendoutFxOam;
         if(LoadSpriteSheet(&sheet)==0xFFFF)continue;
         sSendout.ball[i]=CreateSprite(&ball,0,0,0);
@@ -88,6 +88,8 @@ static void SendoutInit(void)
         b->drawnFrame=0;b->drawnDirection=b->facing;
         gSprites[b->sprite].y=b->y/Q+8-b->art->ground[ARENA_ANIM_IDLE*8+b->facing]*MonVisualScale(i)/256;
     }
+    if(!(sArenaSendoutMask & ((gBattleTypeFlags&BATTLE_TYPE_TRAINER)?3:1)))
+    {SendoutFinish();return;}
     sSendout.active=TRUE;gArenaSendoutTelemetry[0]=1;
 }
 
@@ -117,7 +119,7 @@ static void SendoutTick(void)
         struct Sprite *p=&gSprites[b->sprite];
         u8 trainer=gArenaTrainerTelemetry[i];
         s16 sx=i?223:17, sy=i?49:113;
-        if(i&&!gArenaSendoutTelemetry[5])continue;
+        if(!(sArenaSendoutMask&(1<<i)) || (i&&!gArenaSendoutTelemetry[5]))continue;
         if(trainer<MAX_SPRITES)
         {
             struct Sprite *tr=&gSprites[trainer];

@@ -1236,5 +1236,12 @@
     "poses": {
       "Attack": "Shoot"
     }
+  },
+  {
+    "dex": "0382",
+    "species": "KYOGRE",
+    "level": 70,
+    "frame_fit": [3, 4],
+    "poses": {"Attack": "Shoot", "SpAttack": "Shoot"}
   }
 ]

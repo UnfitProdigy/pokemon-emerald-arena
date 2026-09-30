@@ -48,6 +48,66 @@ void ArenaLab_Tick(void)
     gArenaLabMailbox.result = 0;
     switch (command)
     {
+    case 29:
+    {
+        // Private legal TM setup; no stats, HP, AI or outcome manipulation.
+        u8 ability=1; // Gardevoir Trace: native intro copies Inner Focus.
+        SetMonData(&gPlayerParty[0],MON_DATA_ABILITY_NUM,&ability);
+        SetMonMoveSlot(&gPlayerParty[0],MOVE_PROTECT,0);
+        SetMonMoveSlot(&gPlayerParty[0],MOVE_HYPER_BEAM,1);
+        SetMonMoveSlot(&gPlayerParty[0],MOVE_PSYCHIC,2);
+        SetMonMoveSlot(&gPlayerParty[0],MOVE_TELEPORT,3);
+        break;
+    }
+    case 28:
+        // Disposable inventory for native bag/menu acceptance. No HP writes.
+        if(!AddBagItem(ITEM_POTION,5)||!AddBagItem(ITEM_SUPER_POTION,5))gArenaLabMailbox.result=2;
+        break;
+    case 27:
+        // Disposable demo lead-in, original Brawly conversation and party.
+        FlagClear(FLAG_DEFEATED_DEWFORD_GYM);
+        gSaveBlock2Ptr->optionsTextSpeed=OPTIONS_TEXT_SPEED_FAST;
+        SetWarpDestination(MAP_GROUP(MAP_DEWFORD_TOWN_GYM),MAP_NUM(MAP_DEWFORD_TOWN_GYM),-1,4,6);
+        DoWarp();break;
+    case 26:
+    {
+        // Private map-only scenery fixture; never selects a render stage or
+        // changes an opponent. Production selection reads the actual map.
+        static const u16 maps[]={MAP_PETALBURG_WOODS,MAP_ROUTE124,MAP_GRANITE_CAVE_1F,
+            MAP_ROUTE111,MAP_OLDALE_TOWN_POKEMON_CENTER_1F,MAP_ROUTE119,MAP_ROUTE109,
+            MAP_OLDALE_TOWN,MAP_RUSTBORO_CITY_GYM,MAP_DEWFORD_TOWN_GYM,
+            MAP_MAUVILLE_CITY_GYM,MAP_LAVARIDGE_TOWN_GYM_1F,MAP_PETALBURG_CITY_GYM,
+            MAP_FORTREE_CITY_GYM,MAP_MOSSDEEP_CITY_GYM,MAP_SOOTOPOLIS_CITY_GYM_1F};
+        u16 i=gArenaLabMailbox.species;
+        if(i>=ARRAY_COUNT(maps)){gArenaLabMailbox.result=2;break;}
+        SetWarpDestination(maps[i]>>8,maps[i]&255,-1,i==0?15:i==1?17:i==2?36:i==3?20:i==6?15:5,i==0?20:i==1?10:i==2?11:i==3?65:i==6?2:8);
+        DoWarp();break;
+    }
+    case 25:
+    {
+        // Passive held-item fixture for evolution inhibition QA.
+        u16 item=ITEM_EVERSTONE;
+        SetMonData(&gPlayerParty[0],MON_DATA_HELD_ITEM,&item);
+        break;
+    }
+    case 24:
+    {
+        // Explicit boundary fixture in a disposable save, before any battle.
+        // The subsequent KO must supply real native XP to cross the threshold.
+        struct Pokemon *mon=&gPlayerParty[0];
+        u16 species=GetMonData(mon,MON_DATA_SPECIES);
+        u8 level=GetMonData(mon,MON_DATA_LEVEL);
+        u32 exp;
+        if(species!=SPECIES_CHARMELEON || level!=35)
+        {gArenaLabMailbox.result=2;break;}
+        exp=gExperienceTables[gSpeciesInfo[species].growthRate][36]-400;
+        SetMonData(mon,MON_DATA_EXP,&exp);
+        SetMonMoveSlot(mon,MOVE_FLAMETHROWER,0);
+        SetMonMoveSlot(mon,MOVE_SMOKESCREEN,1);
+        SetMonMoveSlot(mon,MOVE_EMBER,2);
+        SetMonMoveSlot(mon,MOVE_NONE,3);
+        break;
+    }
     case 1:
     case 18:
     case 22:
@@ -79,6 +139,12 @@ void ArenaLab_Tick(void)
             switch(gArenaLabMailbox.species)
             {
             case SPECIES_CHARIZARD: move=MOVE_FLAMETHROWER; break;
+            case SPECIES_DRAGONITE:
+            {
+                u16 item=ITEM_NONE; // Ordinary itemless wild specimen, not Dragon Scale.
+                SetMonData(&gEnemyParty[0],MON_DATA_HELD_ITEM,&item);
+                move=MOVE_HYPER_BEAM;break;
+            }
             case SPECIES_HARIYAMA: move=MOVE_TACKLE; break;
             case SPECIES_BLASTOISE: move=MOVE_WATER_GUN; break;
             case SPECIES_MEWTWO: move=MOVE_PSYCHIC; break;
@@ -226,7 +292,14 @@ void ArenaLab_Tick(void)
     {
         // Disposable legal TM/tutor loadouts; never changes a release save.
         u16 species=GetMonData(&gPlayerParty[0],MON_DATA_SPECIES);
-        if(species==SPECIES_STARMIE||species==SPECIES_ALAKAZAM)
+        if(species==SPECIES_KYOGRE||species==SPECIES_RAIKOU)
+        {
+            SetMonMoveSlot(&gPlayerParty[0],MOVE_RAIN_DANCE,0);
+            SetMonMoveSlot(&gPlayerParty[0],species==SPECIES_KYOGRE?MOVE_SURF:MOVE_SHOCK_WAVE,1);
+            SetMonMoveSlot(&gPlayerParty[0],species==SPECIES_KYOGRE?MOVE_HYDRO_PUMP:MOVE_BITE,2);
+            SetMonMoveSlot(&gPlayerParty[0],MOVE_NONE,3);
+        }
+        else if(species==SPECIES_STARMIE||species==SPECIES_ALAKAZAM)
         {
             u8 ability=species==SPECIES_ALAKAZAM?1:0;
             SetMonData(&gPlayerParty[0],MON_DATA_ABILITY_NUM,&ability);
@@ -290,6 +363,18 @@ void ArenaLab_Tick(void)
         for(i=0;i<PARTY_SIZE;i++)
         {
             u16 species=GetMonData(&gPlayerParty[i],MON_DATA_SPECIES);
+            if(species==SPECIES_KYOGRE)
+            {
+                SetMonMoveSlot(&gPlayerParty[i],MOVE_RAIN_DANCE,0);
+                SetMonMoveSlot(&gPlayerParty[i],MOVE_SURF,1);
+                SetMonMoveSlot(&gPlayerParty[i],MOVE_HYDRO_PUMP,2);
+            }
+            if(species==SPECIES_RAIKOU)
+            {
+                SetMonMoveSlot(&gPlayerParty[i],MOVE_SHOCK_WAVE,0);
+                SetMonMoveSlot(&gPlayerParty[i],MOVE_BITE,1);
+                SetMonMoveSlot(&gPlayerParty[i],MOVE_RAIN_DANCE,2);
+            }
             if(species==SPECIES_BLASTOISE)SetMonMoveSlot(&gPlayerParty[i],MOVE_SURF,0);
             if(species==SPECIES_BLASTOISE)SetMonMoveSlot(&gPlayerParty[i],MOVE_ICY_WIND,1);
             if(species==SPECIES_LAPRAS)

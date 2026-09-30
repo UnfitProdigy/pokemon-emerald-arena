@@ -24,15 +24,49 @@ build_background() {
     .arena-dev/art/pack-background graphics/arena/forest-clearing-v2-clean.png .arena-dev/art/forest.8bpp .arena-dev/art/forest.gbapal .arena-dev/art/forest.bin
   fi
   for biome in coast cave desert gym; do
-    if [[ ! -f .arena-dev/art/$biome-props.4bpp || graphics/arena/props-$biome-v2.png -nt .arena-dev/art/$biome-props.4bpp || tools/arena/pack_props.c -nt .arena-dev/art/$biome-props.4bpp ]]; then
-      cc -std=c11 -O2 -Wall -Wextra -Werror -I/opt/homebrew/include tools/arena/pack_props.c -L/opt/homebrew/lib -lpng -o .arena-dev/art/pack-props
-      .arena-dev/art/pack-props graphics/arena/props-$biome-v2.png .arena-dev/art/$biome-props.4bpp .arena-dev/art/$biome-pieces.4bpp .arena-dev/art/$biome-blast.4bpp .arena-dev/art/$biome-prop-palettes.gbapal
+    prop_source="graphics/arena/props-$biome-v2.png"
+    stage_source="graphics/arena/biome-$biome-v1.png"
+    if [[ "$biome" == gym && -f graphics/arena/props-gym-pmd-v3.png && -f graphics/arena/biome-gym-pmd-v3.png ]]; then
+      prop_source=graphics/arena/props-gym-pmd-v3.png
+      stage_source=graphics/arena/biome-gym-pmd-v3.png
     fi
-    if [[ ! -f .arena-dev/art/$biome.8bpp || graphics/arena/biome-$biome-v1.png -nt .arena-dev/art/$biome.8bpp || tools/arena/pack_background.c -nt .arena-dev/art/$biome.8bpp ]]; then
+    if [[ ! -f .arena-dev/art/$biome-props.4bpp || "$prop_source" -nt .arena-dev/art/$biome-props.4bpp || tools/arena/pack_props.c -nt .arena-dev/art/$biome-props.4bpp ]]; then
+      cc -std=c11 -O2 -Wall -Wextra -Werror -I/opt/homebrew/include tools/arena/pack_props.c -L/opt/homebrew/lib -lpng -o .arena-dev/art/pack-props
+      .arena-dev/art/pack-props "$prop_source" .arena-dev/art/$biome-props.4bpp .arena-dev/art/$biome-pieces.4bpp .arena-dev/art/$biome-blast.4bpp .arena-dev/art/$biome-prop-palettes.gbapal
+    fi
+    if [[ ! -f .arena-dev/art/$biome.8bpp || "$stage_source" -nt .arena-dev/art/$biome.8bpp || tools/arena/pack_background.c -nt .arena-dev/art/$biome.8bpp ]]; then
       cc -std=c11 -O2 -Wall -Wextra -Werror -I/opt/homebrew/include tools/arena/pack_background.c -L/opt/homebrew/lib -lpng -o .arena-dev/art/pack-background
-      .arena-dev/art/pack-background graphics/arena/biome-$biome-v1.png .arena-dev/art/$biome.8bpp .arena-dev/art/$biome.gbapal .arena-dev/art/$biome.bin
+      .arena-dev/art/pack-background "$stage_source" .arena-dev/art/$biome.8bpp .arena-dev/art/$biome.gbapal .arena-dev/art/$biome.bin
     fi
   done
+  # Community stages: originals remain outside Git; adapted PNGs are inputs.
+  community_repack=0
+  for source in tools/arena/import_oswarlin.py graphics/arena/oswarlin/*.png; do
+    if [[ ! -f graphics/arena/oswarlin/flood.8bpp || "$source" -nt graphics/arena/oswarlin/flood.8bpp ]]; then community_repack=1; fi
+  done
+  if [[ "$community_repack" == 1 ]]; then
+    community_python="${ARENA_PYTHON:-python3}"
+    if ! "$community_python" -c 'import PIL' >/dev/null 2>&1; then
+      if [[ -x ../venv/bin/python ]]; then community_python=../venv/bin/python;
+      else printf '%s\n' 'Community art needs Pillow: set ARENA_PYTHON to its Python environment.'; exit 1; fi
+    fi
+    "$community_python" tools/arena/import_oswarlin.py
+    touch src/arena_stage_art.c src/realtime_arena.c
+  fi
+  # INCBIN resources inside .inc files are not discovered by the upstream
+  # dependency scanner. Keep the derived flood floor/contact assets current.
+  storm_repack=0
+  for storm_input in tools/arena/pack_storm.py graphics/arena/storm/*.png .arena-dev/art/*.8bpp .arena-dev/art/*.gbapal .arena-dev/art/*props.4bpp; do
+    if [[ ! -f graphics/arena/storm/backgrounds.8bpp || "$storm_input" -nt graphics/arena/storm/backgrounds.8bpp ]]; then storm_repack=1; fi
+  done
+  if [[ "$storm_repack" == 1 ]]; then
+    storm_python="${ARENA_PYTHON:-python3}"
+    if ! "$storm_python" -c 'import PIL' >/dev/null 2>&1; then
+      if [[ -x ../venv/bin/python ]]; then storm_python=../venv/bin/python;
+      else printf '%s\n' 'Storm art needs Pillow: set ARENA_PYTHON to its Python environment.'; exit 1; fi
+    fi
+    "$storm_python" tools/arena/pack_storm.py
+  fi
 }
 case "${1:-help}" in
   assets)

@@ -41,7 +41,9 @@ static void DrawStatusHud(void)
         && sHudLastSpecies[0]==gBattleMons[0].species && sHudLastSpecies[1]==gBattleMons[1].species
         && sHudLastLevel[0]==gBattleMons[0].level && sHudLastLevel[1]==gBattleMons[1].level)return;
     // One small authored background; preserve the terrain through alpha corners.
+    FillWindowPixelBuffer(0,0);
     CpuFastCopy(sHudPanelTiles,gWindows[0].tileData,30*2*32);
+    HudRect(5,15,109,7,1);HudRect(126,15,109,7,1);
     for(side=0;side<2;side++)
     {
         const struct BattlePokemon *mon=&gBattleMons[side];
@@ -50,17 +52,26 @@ static void DrawStatusHud(void)
         u8 color=mon->hp*5<=mon->maxHP?6:mon->hp*2<=mon->maxHP?7:5;
         StringCopy(text,gSpeciesNames[mon->species]);
         Print(x,0,text,4);
-        ConvertIntToDecimalStringN(text,mon->hp,STR_CONV_MODE_LEFT_ALIGN,3);
-        HudTiny(side?218:97,6,text,4,3);
-        text[0]=CHAR_L;
-        ConvertIntToDecimalStringN(text+1,mon->level,STR_CONV_MODE_LEFT_ALIGN,3);
-        HudTiny(side?214:93,0,text,4,4);
+        StringCopy(text,sQualityLevel);
+        ConvertIntToDecimalStringN(text+4,mon->level,STR_CONV_MODE_LEFT_ALIGN,3);
+        HudTiny(side?205:84,3,text,4,7);
         if(mon->hp&&!fill)fill=1;
-        HudRect(bar,12,102,3,12);
-        HudRect(bar,12,fill,1,4);
-        HudRect(bar,13,fill,2,color);
+        HudRect(bar,13,102,8,12);
+        HudRect(bar,13,fill,1,4);
+        HudRect(bar,14,fill,7,color);
+        ConvertIntToDecimalStringN(text,mon->hp,STR_CONV_MODE_LEFT_ALIGN,3);
+        HudTiny(bar+46,16,text,9,3);
+        HudTiny(bar+45,15,text,4,3);
         sHudLastHp[side]=mon->hp;sHudLastMax[side]=mon->maxHP;sHudLastSpecies[side]=mon->species;
         sHudLastLevel[side]=mon->level;
+    }
+    if(!(gBattleTypeFlags&BATTLE_TYPE_TRAINER)
+        && GetSetPokedexFlag(SpeciesToNationalPokedexNum(gBattleMons[1].species),FLAG_GET_CAUGHT))
+    {
+        HudRect(118,4,5,7,9);HudRect(117,5,7,5,9);
+        HudRect(119,4,3,1,6);HudRect(118,5,5,2,6);
+        HudRect(118,8,5,2,4);HudRect(119,10,3,1,4);
+        HudRect(120,7,1,1,4);
     }
     sHudCached=TRUE;
 }

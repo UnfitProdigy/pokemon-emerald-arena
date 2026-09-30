@@ -159,8 +159,7 @@ static void TossSpaceStep(u8 step)
     case 4: t->blackout = TRUE; break;
     case 5:
     {
-        const u16 *palettes[]={sForestPalette,scoastPalette,scavePalette,sdesertPalette,sgymPalette};
-        HideBg(2); LoadPalette(palettes[gArenaBiome]+TOSS_SPACE_PALETTE,TOSS_SPACE_PALETTE,sizeof(u16)*16);break;
+        HideBg(2); LoadPalette(sStagePalettes[gArenaStage]+TOSS_SPACE_PALETTE,TOSS_SPACE_PALETTE,sizeof(u16)*16);break;
     }
     case 6: t->blackout = FALSE; break;
     case 7: ShowBg(1); ShowBg(0); LoadPalette(sArenaPalette, 0, sizeof(u16)); t->space = FALSE; break;

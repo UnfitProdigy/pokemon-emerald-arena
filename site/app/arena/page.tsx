@@ -1,6 +1,6 @@
 import Gameplay from './Gameplay';
 
-const release = 'https://github.com/GBurgardt/pokemon-emerald-arena/releases/download/v0.10.2/Emerald-Arena-0.10.2.zip';
+const release = 'https://github.com/GBurgardt/pokemon-emerald-arena/releases/download/v0.11.0/Emerald-Arena-0.11.0.zip';
 const repository = 'https://github.com/GBurgardt/pokemon-emerald-arena';
 
 export default function Arena() {

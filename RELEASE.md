@@ -1,3 +1,21 @@
+# Emerald Arena 0.11.0
+
+[Download](https://github.com/GBurgardt/pokemon-emerald-arena/releases/download/v0.11.0/Emerald-Arena-0.11.0.zip) · [Full BPS patch](https://github.com/GBurgardt/pokemon-emerald-arena/releases/download/v0.11.0/Emerald-Arena-0.11.0-full.bps) · [Gameplay](media/emerald-arena-protect-playtest.mp4)
+
+- Protect stops Hyper Beam with dissolving waves and particles. No reflected attack or bonus damage. Psychic remains a separate move.
+- Bag and party access during combat, clearer HP/level information, a caught indicator and non-blocking XP notifications. Thanks to @MatheusLynar for playtesting.
+- In-battle evolution after earned native XP, with healing and a combat pause. A surviving Pokémon stays on the field when the opponent sends out its next Pokémon. Thanks to @shubshub11 for the idea.
+- Temporary rain, flooding and conductive water; community arenas supplied by @Oswarlin3, adapted with matching props and wet palettes. Terrain ideas from @p_Itzo and @GajoeDraws.
+- 151 animated Pokémon, including Kyogre. Previously shipped moves and Didier Lopes' contributions are preserved.
+
+Back up your in-game save before updating. Do not reuse emulator save states.
+Unsupported encounters retain the safe classic fallback. Not full-adventure or physical-GBA validation.
+
+Verified candidate: lab boot/save/replay (14), Protect (9), combat (11), capture (21), result flow (10), HUD and release cold boot without the lab mailbox.
+ROM SHA-256: `5ba5bfe44e5f8ba92904402a6f7c35664d6473692ea3ad238334d48f3df742f8`.
+
+The clean pinned-source build, installer (546 hash-verified source PNGs) and full BPS reconstruction match that hash byte for byte. All 17 public installer/player-journey checks pass. No original ROM or save is distributed.
+
 # Emerald Arena 0.10.2
 
 [Download](https://github.com/GBurgardt/pokemon-emerald-arena/releases/download/v0.10.2/Emerald-Arena-0.10.2.zip) · [Full BPS patch](https://github.com/GBurgardt/pokemon-emerald-arena/releases/download/v0.10.2/Emerald-Arena-0.10.2-full.bps)

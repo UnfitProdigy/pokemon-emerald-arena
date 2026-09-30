@@ -1,5 +1,11 @@
 # Credits
 
+- [Matheus Lynar](https://x.com/MatheusLynar): hands-on playtesting and feedback behind bag/party access, clearer HP and level information, caught indicators and non-blocking XP notices. Private messages are not reproduced.
+- [Oswarlin](https://x.com/Oswarlin3): community-supplied arenas, adapted to native GBA dimensions and palettes. Individual source filenames and hashes are in `game/overlay/graphics/arena/oswarlin/credits.json`. These assets are not relicensed under the code's MIT license.
+- [@shubshub11](https://x.com/shubshub11/status/2103324497692787027): in-battle evolution and health recovery idea.
+- [@p_Itzo](https://x.com/p_Itzo/status/2103936738305638457) and [@GajoeDraws](https://x.com/GajoeDraws/status/2103554449687949566): temporary arena transformation and water/electricity ideas.
+- Protect/Hyper Beam and evolution effect art: project-specific code-generated pixel art with Claude assistance. Protect blocks and dissipates the beam; it does not reflect it.
+
 - [Didier Lopes](https://github.com/DidierRLopes): accelerating Rollout, its palette-based rolling form, obstacle breaking and opponent squash in [PR #4](https://github.com/GBurgardt/pokemon-emerald-arena/pull/4). Original commits retained.
 - [@Jahusek](https://x.com/Jahusek/status/2103395525265375697): real-time Rollout suggestion. [@GajoeDraws](https://x.com/GajoeDraws/status/2103555185398169731): continuing through the opponent.
 - [@p_Itzo](https://x.com/p_Itzo/status/2103642975259807761): Reflect and Light Screen. [@MatheusLynar](https://x.com/MatheusLynar): level display and trainer-identity feedback.
@@ -10,7 +16,7 @@
 - [pret/pokeemerald](https://github.com/pret/pokeemerald):
   Pokémon Emerald decompilation and reconstruction.
 - [PMDCollab/SpriteCollab](https://github.com/PMDCollab/SpriteCollab):
-  animation sources, metadata and individual credits for the 150 Pokémon.
+  animation sources, metadata and individual credits for the 151 Pokémon.
   Pin: `d25607ff4746957df10bdb78db090887cd94f1f8`.
   The installer manifest preserves each species' credit file. The original
   sheets credit CHUNSOFT and individual PMDCollab contributors. The web installer downloads and converts these locally.

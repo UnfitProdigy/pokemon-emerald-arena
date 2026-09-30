@@ -2,7 +2,7 @@
 
 Pokémon Emerald with real time battles. Inside the original GBA game.
 
-[**Download Emerald Arena**](https://github.com/GBurgardt/pokemon-emerald-arena/releases/download/v0.10.2/Emerald-Arena-0.10.2.zip) · [Installation guide](PLAY.md)
+[**Download Emerald Arena**](https://github.com/GBurgardt/pokemon-emerald-arena/releases/download/v0.11.0/Emerald-Arena-0.11.0.zip) · [Installation guide](PLAY.md)
 
 [**Follow development on Twitter / X**](https://x.com/germanburgardt) for new previews, progress and updates.
 
@@ -10,15 +10,16 @@ Pokémon Emerald with real time battles. Inside the original GBA game.
 
 ## Watch gameplay
 
-[![Lugia and Ho-Oh in real time battles](media/emerald-arena-150.gif)](https://github.com/GBurgardt/pokemon-emerald-arena/raw/refs/heads/main/media/emerald-arena-150.mp4)
+[![Protect and community playtest improvements](media/emerald-arena-protect-playtest.jpg)](https://github.com/GBurgardt/pokemon-emerald-arena/raw/refs/heads/main/media/emerald-arena-protect-playtest.mp4)
 
-[New battles · 47 seconds with sound](media/emerald-arena-150.mp4) · [Full gameplay · 2:26 with sound](https://github.com/GBurgardt/pokemon-emerald-arena/raw/refs/heads/main/media/emerald-arena-full-gameplay.mp4)
+[New improvements · 50 seconds with sound](media/emerald-arena-protect-playtest.mp4) · [Full gameplay · 2:26 with sound](https://github.com/GBurgardt/pokemon-emerald-arena/raw/refs/heads/main/media/emerald-arena-full-gameplay.mp4)
 
 [Playing on an AYN Thor · 16 seconds](https://github.com/GBurgardt/pokemon-emerald-arena/raw/refs/heads/main/media/emerald-arena-ayn-thor.mp4)
 
-New in 0.10.2: 50 more animated Pokémon, Rollout, Reflect and Light Screen.
-150 Pokémon, with larger Lugia, Ho-Oh and Salamence and better ground alignment.
-[Watch the new gameplay](media/emerald-arena-150.mp4).
+New in 0.11.0: Protect and Hyper Beam, bag and party menus during battle,
+clearer HP/levels, caught indicators and XP notifications while walking.
+Also includes in-battle evolution, temporary rain/flooding and Oswarlin's arenas.
+151 animated Pokémon. [Watch the new gameplay](media/emerald-arena-protect-playtest.mp4).
 
 Dig, Fly, Teleport, Seismic Toss, Double Team and elemental terrain are still included. [Watch the four new moves · 46 seconds](media/emerald-arena-four-moves.mp4).
 Seismic Toss was contributed by [Didier Lopes](https://github.com/DidierRLopes) in [PR #1](https://github.com/GBurgardt/pokemon-emerald-arena/pull/1).
@@ -48,7 +49,7 @@ Supported wild and single trainer battles use the arena automatically. Double, l
 
 ## Controls
 
-Direction buttons to move. **A** to attack. **B + a direction** to dodge. **START** to pick a move.
+Direction buttons to move. **A** to attack. **B + a direction** to dodge. **START** to pause; **L/R** selects moves, bag or party while paused. **SELECT** opens the party.
 Hold **L + R** to aim a Poké Ball; release to throw, **B** to cancel.
 [All controls](PLAY.md#controls).
 

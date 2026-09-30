@@ -4,6 +4,7 @@
 #include "arena_move_fx.h"
 #include "arena_render.h"
 #include "arena_psychic.h"
+#include "realtime_arena.h"
 #include "sprite.h"
 #include "sound.h"
 #include "constants/songs.h"
@@ -20,6 +21,7 @@ static const u32 sCoastProps[]=INCBIN_U32(".arena-dev/art/coast-props.4bpp");
 static const u32 sCaveProps[]=INCBIN_U32(".arena-dev/art/cave-props.4bpp");
 static const u32 sDesertProps[]=INCBIN_U32(".arena-dev/art/desert-props.4bpp");
 static const u32 sGymProps[]=INCBIN_U32(".arena-dev/art/gym-props.4bpp");
+static const u32 sWetProps[]=INCBIN_U32("graphics/arena/storm/wet-props.4bpp");
 static const u32 *const sBiomeProps[]={sProps,sCoastProps,sCaveProps,sDesertProps,sGymProps};
 static const u32 sBlast[]=INCBIN_U32(".arena-dev/art/blast.4bpp");
 static const u32 sCrater[]=INCBIN_U32(".arena-dev/art/crater.4bpp");
@@ -117,11 +119,15 @@ void ArenaTerrain_Draw(bool8 paused,bool8 frozen)
     {
         const struct ArenaProp*p=&gArenaProps[i];
         u8 frame=p->broken?2:p->hp<p->maxHp?1:0;
-        if(sPropFrame[i]!=frame)
+        const struct ArenaRect *ground=&gArenaObstacles[i];
+        bool8 wet=!gArenaPsychicRocks[i].state && RealtimeArena_IsFlooded((ground->left+ground->right)/2,ground->bottom);
+        const u8 *source=wet?(const u8*)sWetProps+gArenaBiome*7*3*512:(const u8*)sBiomeProps[gArenaBiome];
+        u8 key=frame+(wet?3:0);
+        if(sPropFrame[i]!=key)
         {
-            ArenaRender_Copy((const u8*)sBiomeProps[gArenaBiome]+(i*3+frame)*512,
+            ArenaRender_Copy(source+(i*3+frame)*512,
                 (u8*)OBJ_VRAM0+GetSpriteTileStartByTag(TAG+i)*32,512);
-            sPropFrame[i]=frame;
+            sPropFrame[i]=key;
         }
         if(sPropSprite[i]!=MAX_SPRITES)
         {
@@ -154,7 +160,8 @@ void ArenaTerrain_Draw(bool8 paused,bool8 frozen)
         if(sPieceSprite[i]==MAX_SPRITES)continue;
         s=&gSprites[sPieceSprite[i]];
         s->x=f->x/256;s->y=(f->y-f->z)/256;
-        s->invisible=paused||!f->life||s->y<20||(f->life<12&&(f->life&2));
+        s->invisible=paused||!f->life||s->y<20||(f->life<12&&(f->life&2))
+            ||(f->z<512&&RealtimeArena_IsFlooded(f->x/256,f->y/256));
         s->oam.tileNum=GetSpriteTileStartByTag(TAG+ARENA_OBSTACLES)+f->kind*4+((f->age/4)&3);
         s->oam.paletteNum=ArenaMoveFx_Palette(f->kind);
     }
