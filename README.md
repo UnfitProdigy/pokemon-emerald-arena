@@ -4,6 +4,8 @@ Pokémon Emerald with real time battles. Inside the original GBA game.
 
 [**Download Emerald Arena**](https://github.com/GBurgardt/pokemon-emerald-arena/releases/download/v0.11.0/Emerald-Arena-0.11.0.zip) · [Installation guide](PLAY.md)
 
+[**Project website**](https://burgar.dev/emerald) · [How I’m building it with the community](https://burgar.dev/notes/emerald.html)
+
 [**Follow development on Twitter / X**](https://x.com/germanburgardt) for new previews, progress and updates.
 
 [**Join the Discord**](https://discord.gg/GBVjbNhEdb) to chat, share ideas and report bugs. English and Spanish welcome.
